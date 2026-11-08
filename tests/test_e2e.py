@@ -86,6 +86,23 @@ def test_full_size_two_domain_flow(tmp_path, synth_data, synth_med):
     assert (out / "frozen" / "thresholds.json").read_text() == thr_before
 
 
+def test_flow_with_na_configs(tmp_path, synth_data, fixtures):
+    """A model without thinking (E2/E4 n/a), e.g. the DeepSeek replication: everything still runs."""
+    _cli("smoke", "--data", fixtures / "gsm8k" / "cases_gsm8k.jsonl", "--n", 10, "--model", "cheap-api",
+         "--backend", "mock", "--out", tmp_path / "smoke", "--B", 100, "--R", 100)
+    out = tmp_path / "outputs"
+    _cli("freeze", "--datasets", "synth_math", "--models", "deepseek-v4-flash-0731@mock", "--out", out)
+    _cli("run", "--data", synth_data, "--model", "deepseek-v4-flash-0731@mock", "--out", out)
+    _cli("evaluate", "--data", synth_data, "--model", "deepseek-v4-flash-0731@mock", "--out", out, "--B", 200, "--R", 200)
+    _cli("report", "--model", "deepseek-v4-flash-0731@mock", "--datasets", "synth_math", "--out", out,
+         "--reports-dir", tmp_path / "reports", "--B", 200)
+    ev = read_json(out / "eval" / "synth_math" / "deepseek-v4-flash-0731@mock" / "evaluation.json")
+    assert ev["configs"]["E2"]["na"] and ev["configs"]["E4"]["na"]
+    assert set(ev["comparisons"]["primary_endpoint"]) == {"E1", "E3"}
+    assert not ev["comparisons"]["interaction"]
+    assert "n/a" in (tmp_path / "reports" / "deepseek-v4-flash-0731@mock" / "report.md").read_text(encoding="utf-8")
+
+
 def test_run_refused_after_prompt_change(tmp_path, synth_data, root):
     """Changing a prompt after freeze -> formal run refused (rc 2)."""
     import os

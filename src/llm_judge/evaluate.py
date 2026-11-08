@@ -196,7 +196,7 @@ def compare(test_rows: dict[str, list[dict]], configs: dict, thresholds: dict, B
     out: dict = {"B": B, "seed": seed, "primary_endpoint": {}, "selective_secondary": {}, "sensitivity_endpoint": {},
                  "aurc": {}, "aurc_diff_vs_base": {}, "accuracy_vs_base": {}, "brier": {}, "interaction": {},
                  "direct_abstention": {}}
-    roles = _factorial_roles(configs)
+    roles = _factorial_roles({c: configs[c] for c in test_rows})  # n/a configs have no rows -> no role
     base = roles.get("base")
 
     for c in binary:
