@@ -1,0 +1,36 @@
+# Dataset registry. One entry per dataset; the pipeline never hard-codes a dataset.
+#
+#   adapter    : path (relative to repo root) of the module that converts raw data -> case schema
+#   task_type  : numeric | multiple_choice   (selects the prompt skeleton family)
+#   domain     : math | medical              (used for grouping in reports)
+#   rubric     : rubric fragment inserted into the {{rubric}} slot of rubric skeletons
+#   data_path  : default location of the frozen cases file (used by `screen`; overridable with --data)
+
+gsm8k:
+  adapter: adapters/gsm8k.py
+  task_type: numeric
+  domain: math
+  rubric: prompts/rubrics/math.md
+  data_path: data/gsm8k/cases_gsm8k.jsonl
+
+medqa:
+  adapter: adapters/medqa.py
+  task_type: multiple_choice
+  domain: medical
+  rubric: prompts/rubrics/medical.md
+  data_path: data/medqa/cases_medqa.jsonl
+
+# Synthetic datasets produced by `python -m llm_judge.synthetic` (tests / demos only).
+synth_math:
+  adapter: null
+  task_type: numeric
+  domain: math
+  rubric: prompts/rubrics/math.md
+  data_path: data/synth_math/cases_synth_math.jsonl
+
+synth_med:
+  adapter: null
+  task_type: multiple_choice
+  domain: medical
+  rubric: prompts/rubrics/medical.md
+  data_path: data/synth_med/cases_synth_med.jsonl

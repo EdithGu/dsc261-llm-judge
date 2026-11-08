@@ -1,0 +1,7 @@
+# Data files are hashed byte-for-byte (manifest.json SHA256) — never rewrite line endings.
+*.jsonl -text
+manifest.json -text
+# Prompts / parser are hashed after CRLF->LF normalisation, but keep them LF anyway.
+*.md text eol=lf
+*.py text eol=lf
+*.yaml text eol=lf

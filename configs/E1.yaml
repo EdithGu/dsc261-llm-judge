@@ -1,0 +1,6 @@
+# Experiment config E1 — decoupled from dataset and model.
+id: E1
+description: "Minimal baseline"
+thinking: false
+rubric: false
+output_mode: binary   # binary: correct/incorrect ; ternary: correct/incorrect/abstain

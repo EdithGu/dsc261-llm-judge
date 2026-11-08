@@ -218,3 +218,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ---- llm-judge pipeline ----
+# smoke / screen outputs are throwaway; formal raw outputs and outputs/frozen/ are kept.
+outputs/smoke/
+outputs/screen/
+outputs/**/*.tmp
