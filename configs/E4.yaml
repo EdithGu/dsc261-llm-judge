@@ -1,0 +1,6 @@
+# Experiment config E4 — decoupled from dataset and model.
+id: E4
+description: "Thinking + rubric"
+thinking: true
+rubric: true
+output_mode: binary   # binary: correct/incorrect ; ternary: correct/incorrect/abstain

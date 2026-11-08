@@ -1,0 +1,9 @@
+{
+  "file": "cases_gsm8k.jsonl",
+  "dataset_id": "gsm8k",
+  "sha256": "54b1fe4bce761038fbf7f6072de1bb259f0f3fed34cfec28ce360707b7877f30",
+  "sampling_seed": 0,
+  "n_cases": 10,
+  "split_counts": {"pilot": 2, "probe": 2, "calib": 3, "test": 3},
+  "note": "hand-written fixture cases in the style of the dataset (not copied from it)"
+}

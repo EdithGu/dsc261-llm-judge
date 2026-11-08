@@ -1,0 +1,6 @@
+# Experiment config E2 — decoupled from dataset and model.
+id: E2
+description: "Thinking only"
+thinking: true
+rubric: false
+output_mode: binary   # binary: correct/incorrect ; ternary: correct/incorrect/abstain
