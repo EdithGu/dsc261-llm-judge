@@ -1,0 +1,129 @@
+# Model registry. Switching models = editing this file; runner code does not change.
+#
+#   backend        : vllm | api | mock
+#   checkpoint     : model name sent in the request (vLLM: --served-model-name / HF id)
+#   checksum       : (optional) checkpoint checksum, copied into run_manifest.json
+#   base_url       : OpenAI-compatible endpoint (…/v1)
+#   api_key_env    : env var holding the API key (api backend; vLLM usually needs none)
+#   context_length / max_tokens
+#   batch_size     : number of concurrent requests. FIXED for formal runs (D1) and recorded in the manifest.
+#   max_retries    : retries for *execution* failures only (network / OOM / 5xx). Format errors are never retried.
+#   decoding       : two parameter sets, keyed by thinking mode (D1). Standard OpenAI keys are sent as-is;
+#                    other keys (top_k, min_p, ...) are sent top-level for vllm and only via `extra_body` for api.
+#   thinking       : how the thinking switch works for this model
+#       supported: false                       -> E2/E4 become n/a
+#       method: chat_template_kwargs           -> {"chat_template_kwargs": {<kwarg>: true/false}}
+#       method: system_prompt                  -> append on_suffix / off_suffix to the user turn
+#       method: checkpoint                     -> on_checkpoint / off_checkpoint are different models
+#       method: fixed, fixed_mode: "off"|"on"  -> only one mode exists; the other becomes n/a (quote it!)
+#   logprobs       : D5 — reserved, default false. Exploratory only.
+
+qwen3.8-27b:
+  backend: vllm
+  checkpoint: Qwen/Qwen3.8-27B            # TODO(pilot): confirm exact HF id / served-model-name
+  checksum: null                          # TODO(pilot): fill after download (e.g. sha256 of safetensors index)
+  base_url: http://localhost:8000/v1
+  api_key_env: null
+  context_length: 32768
+  max_tokens: 8192                        # thinking traces can be long; check truncation rate in pilot
+  batch_size: 16
+  max_retries: 3
+  request_timeout: 600
+  decoding:
+    thinking_off:
+      temperature: 0.0
+      top_p: 1.0
+      seed: 20261107
+    thinking_on:                          # TODO(pilot): confirm against the official model card
+      temperature: 0.6
+      top_p: 0.95
+      top_k: 20
+      min_p: 0.0
+      seed: 20261107
+  thinking:
+    supported: true
+    method: chat_template_kwargs
+    kwarg: enable_thinking
+  logprobs: false
+
+deepseek-v4-flash-0731:
+  backend: api
+  checkpoint: deepseek-v4-flash-0731      # TODO: confirm provider model id
+  checksum: null
+  base_url: https://api.deepseek.com/v1   # TODO: confirm
+  api_key_env: DEEPSEEK_API_KEY
+  context_length: 65536
+  max_tokens: 2048
+  batch_size: 8
+  max_retries: 5
+  request_timeout: 300
+  decoding:
+    thinking_off:
+      temperature: 0.0
+      top_p: 1.0
+      seed: 20261107
+    thinking_on: null
+  thinking:
+    supported: true
+    method: fixed
+    fixed_mode: "off"                     # quoted: bare off is a YAML boolean. Mode is fixed -> only E1/E3/E5 run
+  logprobs: false
+
+# Cheap hosted model for the data group's `probe` command. Any OpenAI-compatible endpoint works.
+cheap-api:
+  backend: api
+  checkpoint: gpt-4o-mini                 # placeholder — replace with whatever cheap model the group has access to
+  checksum: null
+  base_url: https://api.openai.com/v1
+  api_key_env: OPENAI_API_KEY
+  context_length: 128000
+  max_tokens: 512
+  batch_size: 8
+  max_retries: 5
+  request_timeout: 120
+  decoding:
+    thinking_off:
+      temperature: 0.0
+      top_p: 1.0
+      seed: 20261107
+    thinking_on: null
+  thinking:
+    supported: false
+  logprobs: false
+
+# Mock backend: no GPU, no network. Used by unit tests and `smoke`.
+mock:
+  backend: mock
+  checkpoint: mock-judge-v1
+  checksum: null
+  base_url: null
+  api_key_env: null
+  context_length: 100000
+  max_tokens: 1024
+  batch_size: 4
+  max_retries: 2
+  request_timeout: 10
+  decoding:
+    thinking_off:
+      temperature: 0.0
+      seed: 0
+    thinking_on:
+      temperature: 0.6
+      seed: 0
+  thinking:
+    supported: true
+    method: chat_template_kwargs
+    kwarg: enable_thinking
+  logprobs: false
+  mock:                                   # behaviour knobs (overridable with --mock-opt key=value)
+    mode: noisy_oracle                    # noisy_oracle (peeks at the label) | random
+    accuracy: 0.80
+    thinking_bonus: 0.05
+    rubric_bonus: 0.03
+    invalid_rate: 0.03
+    truncate_rate: 0.01
+    exec_fail_rate: 0.0
+    abstain_rate: 0.10
+    tie_rate: 0.40                        # share of confidences snapped to 0.90 / 0.95 (exercises tie-breaking)
+    nondeterminism: 0.0                   # >0 makes replicate runs (tag != main) disagree on that share of cases
+    seed: 0

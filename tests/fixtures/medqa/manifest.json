@@ -1,0 +1,9 @@
+{
+  "file": "cases_medqa.jsonl",
+  "dataset_id": "medqa",
+  "sha256": "83cbd7b780d49baeb2ecaade11a906a311742822e087beae2c68e671d182dda4",
+  "sampling_seed": 0,
+  "n_cases": 10,
+  "split_counts": {"pilot": 2, "probe": 2, "calib": 3, "test": 3},
+  "note": "hand-written fixture cases in the style of the dataset (not copied from it)"
+}

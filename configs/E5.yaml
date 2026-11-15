@@ -1,0 +1,6 @@
+# Experiment config E5 — decoupled from dataset and model.
+id: E5
+description: "Direct abstention (ternary output)"
+thinking: false
+rubric: false
+output_mode: ternary   # binary: correct/incorrect ; ternary: correct/incorrect/abstain
